@@ -1,0 +1,8 @@
+# Makefile
+.PHONY:clean
+
+discoC_utest-objs := common.o discoC_utest_ctrlintf.o discoC_utest_cmd_handler.o discoC_utest_manager.o
+discoC_utest-objs += discoC_utest_module_init.o
+
+obj-m := discoC_utest.o
+

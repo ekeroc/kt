@@ -1,0 +1,16 @@
+# Makefile
+.PHONY:clean
+
+
+test_discoC_mem_manager-objs := ../common_util.o ../discoC_mem_manager.o
+test_discoC_mem_manager-objs += ../thread_manager.o ../dms_client_mm.o ../discoC_comm_main.o 
+test_discoC_mem_manager-objs += ../../SelfTest.o ../../config/dmsc_config.o
+test_discoC_mem_manager-objs += Test_discoC_mem_manager.o Test_discoC_mem_manager_module.o
+
+obj-m := test_discoC_mem_manager.o
+
+all:
+	$(MAKE) -C/lib/modules/"$(shell uname -r)"/build M=$(PWD)
+	
+clean:
+	rm -rf *.o *.ko *.symvers *.mod.c .*.cmd Module.markers modules.order .tmp_versions version.h

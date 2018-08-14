@@ -1,0 +1,12 @@
+diff -Naur old/dms_kernel_version.h new/dms_kernel_version.h
+--- old/dms_kernel_version.h	2017-08-16 09:40:37.545928193 +0000
++++ new/dms_kernel_version.h	2017-08-16 09:40:57.945359832 +0000
+@@ -11,7 +11,7 @@
+ #ifndef _DMS_KERNEL_VERSION_H_
+ #define _DMS_KERNEL_VERSION_H_
+ 
+-#define DMSC_sock_recvmsg(sock,msg_ptr,size,flag)   sock_recvmsg(sock,msg_ptr,size,flag)
++#define DMSC_sock_recvmsg(sock,msg_ptr,size,flag)   sock_recvmsg(sock,msg_ptr,flag)
+ 
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
+ #define hlist_for_each_entry_safe_ccma(tpos, pos, n, head, member)      \

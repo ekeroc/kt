@@ -1,0 +1,23 @@
+# Makefile
+.PHONY:clean
+
+#################################
+#       daemon  configs         #
+#################################
+
+DMS_C_INCLUDE= -I/usr/include
+DMS_C_CFLAGS= -Wall -g $(DMS_C_INCLUDE) -lpthread
+DMS_C_MYFLAGS = -DDMSC_USER_DAEMON=1
+
+DMS_C_SRCS = config/dmsc_config.c user_daemon/ipcsocket.c user_daemon/mclient.c
+DMS_C_OBJS = dmsc_config.o ipcsocket.o mclient.o
+
+all:
+	gcc -c $(DMS_C_SRCS) $(DMS_C_MYFLAGS) $(DMS_C_INCLUDE)
+	gcc -o "BlockDeviceDaemon" $(DMS_C_OBJS) $(DMS_C_CFLAGS)
+
+clean:
+	rm -rf *.o
+	rm -rf BlockDeviceDaemon
+
+

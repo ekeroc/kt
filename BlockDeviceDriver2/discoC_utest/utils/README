@@ -1,0 +1,4 @@
+
+NOTE: please don't run disco clientnode when run unit test.
+      Test cache will cause kernel crash if not stop disco clientnode.
+

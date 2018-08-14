@@ -1,0 +1,117 @@
+#!/bin/bash
+
+################################################################################
+# discoCov - disco coverage collection
+#
+# Use gcov/lcov to get coverage data of kerenl module
+# Should be run as superuser to collect data inside debugfs
+#
+# To get branch coverage statitic
+# 1. add lcov_branch_coverage=1 in /etc/lcovrc or .lcovrc
+# 2. add --rc lcov_branch_coverage=1 in all lcov calls
+#
+################################################################################
+
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+ROOT_PATH=$(readlink -f "$SCRIPTPATH/../../")
+
+KERNEL_INFO=$SCRIPTPATH"/kernel.info"
+
+# Kernel souce directory
+KERNEL_SRC="/home/node/kernels/linux-4.4.77/"
+
+# Output html directory
+OUTPUT_DIR="/var/www/html/"
+
+if [ ! -d $KERNEL_SRC ];  then
+    echo "Cannot find kerenl source code: $KERNEL_SRC"
+    exit 1
+fi
+
+if [ "$1" = "-h" ]; then
+echo "
+Usage: discoCov [OPTION]
+
+COMMANDS
+    discoCov
+        Collect coverage files and output html report
+
+    discoCov clean
+        Clean coverage data in kernel directory and output files
+
+    discoCov cleanall
+        \`clean\` plus cleaning all coverage data and object files in src tree"
+exit
+
+elif [ "$1" = "cleanall" ]; then
+
+    # Cleanall: clean source tree
+    echo "Start cleaning data"
+    echo "Delete gcov file under $ROOT_PATH"
+    echo "Delete object file under $ROOT_PATH (may be deprecated)"
+    find $ROOT_PATH -name ".*.gcno" -type f -delete
+    find $ROOT_PATH -name "*.o" -type f -delete
+
+    # Clean: clean record data and output
+    echo "Delete $KERNEL_INFO"
+    echo "Delete output file under $OUTPUT_DIR"
+    rm -rf $OUTPUT_DIR/*
+    rm -f $KERNEL_INFO
+
+    # TODO open permition of /sys/kernel/debug/gcov/reset
+    echo 1 > /sys/kernel/debug/gcov/reset
+    ret=$?
+    if [ $? != 0 ]; then
+        echo "Failed to reset gcov data"
+    fi
+    exit $ret
+
+elif [ "$1" = "clean" ]; then
+
+    # Clean: clean record data and output
+    echo "Delete $KERNEL_INFO"
+    echo "Delete output file under $OUTPUT_DIR"
+    rm -rf $OUTPUT_DIR/*
+    rm -f $KERNEL_INFO
+
+    # TODO open permition of /sys/kernel/debug/gcov/reset
+    echo 1 > /sys/kernel/debug/gcov/reset
+    ret=$?
+    if [ $? != 0 ]; then
+        echo "Failed to reset gcov data"
+    fi
+    exit $ret
+
+else
+    echo "Auto collect"
+fi
+
+echo "Coverage info store in $SCRIPTPATH"
+
+# Auto collect 
+lcov --capture --output-file $KERNEL_INFO -b $KERNEL_SRC --rc lcov_branch_coverage=1
+
+if [ $? -ne 0 ]; then
+    echo "disco_Cov: locv failed"
+    echo "No data found or no permission"
+    exit $?
+fi
+
+if [ -d $OUTPUT_DIR ]; then
+    mkdir -p $OUTPUT_DIR
+    echo "Create dir $OUTPUT_DIR"
+fi
+
+# Use collected data to generate html file
+#rm $OUTPUT_DIR -rf
+genhtml $KERNEL_INFO -o $OUTPUT_DIR --rc lcov_branch_coverage=1
+
+if [ $? -ne 0 ]; then
+    echo "disco_Cov: genhtml failed"
+    exit $?
+fi
+
+
+echo "HTML report generate successfully in $OUTPUT_DIR"
+

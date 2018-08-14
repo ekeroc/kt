@@ -1,0 +1,27 @@
+# Makefile
+.PHONY:clean
+
+GCOV_PROFILE := y
+
+_DISCO_CN_ROOT := ../../../../
+
+KBUILD_EXTRA_SYMBOLS := $(src)/$(_DISCO_CN_ROOT)discoC_utest/Module.symvers
+export $(KBUILD_EXTRA_SYMBOLS)
+ccflags-y := -I$(src)/$(_DISCO_CN_ROOT)discoC_utest/ -I$(src)/$(_DISCO_CN_ROOT)common/ -I$(src)/$(_DISCO_CN_ROOT)config/
+
+obj-m := test_cache.o
+
+# START of Use relative path under project root
+
+test_cache-objs := common/cache.o
+test_cache-objs += config/dmsc_config.o SelfTest.o lib/dms-radix-tree.o
+test_cache-objs += common/dms_client_mm.o common/common_util.o
+test_cache-objs += common/discoC_comm_main.o common/thread_manager.o
+test_cache-objs += common/discoC_mem_manager.o
+
+test_cache-objs := $(addprefix $(_DISCO_CN_ROOT),$(test_cache-objs))
+# END of Use relative path under project root
+
+test_cache-objs += Test_cache_common.o Test_cache_pool.o Test_cache.o Test_cache_module.o
+
+

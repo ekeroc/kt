@@ -1,0 +1,34 @@
+<project name="BlockDeviceDriver" default="compile-devel" basedir=".">
+	<description>
+		Block device driver and C-Daemon
+    </description>
+	<!-- set global properties for this build -->
+	<property name="dir.src"  location="src"/>
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+	</target>
+
+	<target name="compile-devel" depends="init"
+        description="compile the source " >
+		<exec executable="make" >
+		    <arg value="install"/>
+		  </exec>
+		<exec executable="make" >
+		    <arg value="c"/>
+		  </exec>
+	</target>
+
+	<target name="compile-driver-xen" depends="init"
+        description="compile the source " >
+		<exec executable="make" >
+		    <arg value="phy"/>
+		  </exec>
+		<exec executable="make" >
+		    <arg value="c"/>
+		  </exec>
+
+	</target>
+
+</project>

@@ -1,0 +1,23 @@
+# Makefile
+.PHONY:clean
+
+GCOV_PROFILE := y
+
+_DISCO_CN_ROOT := ../../../../
+
+KBUILD_EXTRA_SYMBOLS := $(src)/$(_DISCO_CN_ROOT)discoC_utest/Module.symvers
+export $(KBUILD_EXTRA_SYMBOLS)
+ccflags-y := -I$(src)/$(_DISCO_CN_ROOT)discoC_utest/ -I$(src)/$(_DISCO_CN_ROOT)common/
+
+test_discoC_mem_manager-objs := common/common_util.o common/discoC_mem_manager.o
+test_discoC_mem_manager-objs += common/thread_manager.o common/dms_client_mm.o
+test_discoC_mem_manager-objs += SelfTest.o config/dmsc_config.o
+test_discoC_mem_manager-objs += common/discoC_comm_main.o
+
+test_discoC_mem_manager-objs := $(addprefix $(_DISCO_CN_ROOT),$(test_discoC_mem_manager-objs))
+
+test_discoC_mem_manager-objs += Test_discoC_mem_manager.o Test_discoC_mem_manager_module.o
+
+obj-m := test_discoC_mem_manager.o
+
+

@@ -1,0 +1,30 @@
+# Makefile
+.PHONY:clean
+
+GCOV_PROFILE := y
+
+_DISCO_CN_ROOT := ../../../../
+
+# src variable will set in kernel Makefile
+KBUILD_EXTRA_SYMBOLS := $(src)/$(_DISCO_CN_ROOT)discoC_utest/Module.symvers
+export $(KBUILD_EXTRA_SYMBOLS)
+ccflags-y := -I$(src)/$(_DISCO_CN_ROOT)unittest_framework/
+
+obj-m := test_TARGET.o
+
+# START of Use relative path under project root
+
+test_TARGET-objs := common/DEPENDENCY.o
+
+test_TARGET-objs := $(addprefix $(_DISCO_CN_ROOT),$(test_TARGET-objs))
+
+# END of Use relative path under project root
+
+test_TARGET-objs += Test_TARGET.o Test_TARGET_module.o
+
+
+all:
+	$(MAKE) -C/lib/modules/"$(shell uname -r)"/build M=$(PWD)
+
+clean:
+	rm -rf *.o *.ko *.symvers *.mod.c .*.cmd Module.markers modules.order .tmp_versions version.h

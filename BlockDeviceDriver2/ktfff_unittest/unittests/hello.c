@@ -15,7 +15,7 @@ xsltproc ~/gtest2html/gtest2html.xslt test_detail.xml > test_detail.html
 #include <linux/blkdev.h>
 #include <net/sock.h>
 #include "ktf.h"
-#include "../fff.h"
+#include "../lib/fff.h"
 #include "../../common/discoC_sys_def.h"
 #include "../../common/common_util.h"
 #include "../../common/dms_kernel_version.h"
@@ -51,8 +51,7 @@ DEFINE_FFF_GLOBALS;
 
 // MOCK_FILE: drv_main.c
 FAKE_VALUE_FUNC(int32_t, init_drv_component);
-// MOCK_FILE: drv_blkdev.c
-// MOCK_FILE: drv_fsm.c
+FAKE_VALUE_FUNC(int32_t, rel_drv_component);
 
 TEST(examples, hello_ok)
 {	

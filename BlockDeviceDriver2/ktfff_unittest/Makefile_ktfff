@@ -1,0 +1,22 @@
+# Makefile
+.PHONY:clean
+
+#################################
+#     Kernel module configs     #
+#################################
+ccflags-y += -Wno-declaration-after-statement
+
+PWD    := $(shell pwd)
+KVER = 4.4.0-130-generic
+KTF_DIR = /home/louis/src/ktf/kernel
+KTF_BDIR = /home/louis/build/4.4.0-130-generic/ktf/kernel
+_DISCO_CN_ROOT := ../
+EXTRASYMS := KBUILD_EXTRA_SYMBOLS="$(KTF_BDIR)/Module.symvers"
+
+ccflags-y += -I$(KTF_DIR)
+
+#################################
+#     Kernel module objs        #
+#################################
+
+

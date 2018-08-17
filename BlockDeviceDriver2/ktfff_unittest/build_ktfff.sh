@@ -1,12 +1,22 @@
 #!/bin/bash
 
+#####################################################
+#               Ktfff Unittest Tool                 #
+#                                                   #
+#   install - install ktf framework                 #
+#   run - build && run all unittest                 #
+#   run <test file> - build && run single unittest  #
+#                                                   #
+#####################################################
+
 KTFFF_DIR=`dirname "$(readlink -f "$0")"`
 KTF_MK=$KTFFF_DIR/Makefile
+KTF_MK_TMPL=$KTFFF_DIR/Makefile_ktfff
 
 # usrD_makefn="Makefile_usrDaemon"
-kernM_makefn="Makefile_ktfff"
 
-tmp_dir=build-module-temp
+unitM_temp_dir=$KTFFF_DIR/unittest-module-temp
+unitMK_temp_dir=$KTFFF_DIR/unittest-mk-temp
 kern_header_root_dir="/lib/modules/"
 kern_header_dir=`find ${kern_header_root_dir} -mindepth 1 -maxdepth 1 -type d -print`
 
@@ -17,19 +27,21 @@ subcomp="${subcomp} io_manager"
 
 mkfn_list="${subcomp} main"
 
-major_num=0
-minor_num=0
-release_num=0
-patch_num=0
+# major_num=0
+# minor_num=0
+# release_num=0
+# patch_num=0
 
 function clean_env()
 {
     sudo /bin/rm -rf BlockDeviceDaemon
     sudo /bin/rm -rf *.ko
     sudo /bin/rm -rf Makefile
-    sudo /bin/rm -rf build-module-temp
+    sudo /bin/rm -rf unitM_temp_dir
+    sudo /bin/rm -rf unitMK_temp_dir
    
-    mkdir -p ${tmp_dir}
+    mkdir -p unitM_temp_dir
+    mkdir -p unitMK_temp_dir
 }
 
 function write_kmodule_mkfn()
@@ -52,11 +64,12 @@ function gen_build_kmodule_comp()
 
 function gen_build_kmodule()
 {
-    kver_str=$1
+    local kerN_ver=$1
+
     write_kmodule_mkfn "all:\n"
     write_kmodule_mkfn "\t"
 
-    write_kmodule_mkfn "\$(MAKE) -C/lib/modules/${kver_str}/build \$(EXTRASYMS) M=\$(PWD)\n"
+    write_kmodule_mkfn "\$(MAKE) -C/lib/modules/${kerN_ver}/build \$(EXTRASYMS) M=\$(PWD)\n"
     write_kmodule_mkfn "\n"
 
     write_kmodule_mkfn "clean:\n"
@@ -102,47 +115,74 @@ function build_kern_module()
     for (( idx=0; idx<${#kverN_arr[@]}; idx++ ))
     do
         sudo /bin/rm -rf Makefile
-        sudo /bin/cp $KTFFF_DIR/${kernM_makefn} $KTFFF_DIR/Makefile
+        sudo /bin/cp $KTF_MK_TMPL $KTF_MK
+
         fullpath="${kverN_arr[${idx}]}"
-        kverN_str=`echo ${fullpath#${kern_header_root_dir}}`
+        kerN_ver=`echo ${fullpath#${kern_header_root_dir}}`
 
-        build_test_kern_module
-        gen_build_kmodule ${kverN_str}
-
-        # make clean
-        # make all
-        # err=$?
-
-        # if [ ${err} -ne 0 ]; then
-        #     printf "--------> discoC kernel module build fail: kernel version ${kverN_str}\n"
-        #     exit 1
-        # else
-        #     /bin/mv ccmablk.ko "${tmp_dir}/ccmablk-${kverN_str}.ko"
-        #     make clean
-        # fi
+        mkdir -p ${unitM_temp_dir}/${kerN_ver}
+        mkdir -p ${unitMK_temp_dir}/${kerN_ver}
+        make clean
+        build_unittest_kerN_module
     done
 }
 
-function build_test_kern_module()
+function build_unittest_kerN_module()
 {
     for test_file in $KTFFF_DIR/unittests/*.c; do
         kern_module_name=`basename "$test_file" .c`
         gen_build_kmodule_comp
         gen_kern_module_mk $kern_module_name
+        gen_build_kmodule ${kerN_ver}
+        make all
+        /bin/mv $KTF_MK ${unitMK_temp_dir}/${kerN_ver}/$kern_module_name.mk
+        # /bin/mv $kern_module_name.ko ${unitM_temp_dir}/${kerN_ver}
+    done
+}
+
+function exec_unittest_module()
+{
+    local kerN_ver_dir=$1
+    local cmd=$2
+    for test_module in $kerN_ver_dir/*; do
+        sudo $cmd $test_module            
+    done
+}
+
+# function unittest_info()
+# {
+# }
+
+function unittest_start()
+{   
+    local kerN_ver_dir
+    for kerN_ver_dir in $unitM_temp_dir/*; do
+        local kerN_ver=$(basename $kerN_ver_dir)
+        printf "**************** $kerN_ver unittest starting ****************\n"
+        exec_unittest_module $kerN_ver_dir insmod
+        ktfrun
+        exec_unittest_module $kerN_ver_dir rmmod
     done
 }
 
 
-export LANG=en_US
+# function unittest_teardown()
+# {
+# }
 
+function main()
+{
 clean_env
 # build_user_daemon
 
 build_kern_module
-# /bin/mv ${tmp_dir}/* ./
-# rm -rf ${tmp_dir}
+unittest_start
+# ktfrun
+# /bin/mv ${unitM_temp_dir}/* ./
+# rm -rf ${unitM_temp_dir}
+}
 
-# cd discoC_utest
-# bash build_discoC_utest.sh
-# cd ..
+export LANG=en_US
+main
+
 

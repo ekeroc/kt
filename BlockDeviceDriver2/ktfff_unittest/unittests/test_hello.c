@@ -57,15 +57,16 @@ TEST(examples, hello_ok)
 {	
 	init_drv_component_fake.return_val = true;
 	ASSERT_TRUE(init_drv_component());
-	// rel_drv_component();
-	is_drv_running(true);
+
+	// init_drv(123);
+	// should mock init_dmsc_config and init_chrdev
 	ASSERT_INT_EQ(init_drv_component_fake.call_count, 1);
 }
 
 
 TEST(examples, hello_fail)
 {	
-	// ASSERT_INT_EQ(bar(3), 20);
+	// ASSERT_INT_EQ(20, 20);
 }
 
 static void add_tests(void)

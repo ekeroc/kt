@@ -64,6 +64,7 @@ function gen_kern_module_mk()
 
 function build_all_kern_module()
 {
+    local suite_list=$@
     kverN_arr=($kern_header_dir)
 
     for (( idx=0; idx<${#kverN_arr[@]}; idx++ ))
@@ -78,7 +79,7 @@ function build_all_kern_module()
         mkdir -p ${unitMK_temp_dir}/${kerN_ver}
         make clean
 
-        for test_file in $KTFFF_DIR/unittests/*.c; do
+        for test_file in $suite_list; do
             build_unittest_kerN_module
         done
     done
@@ -86,11 +87,11 @@ function build_all_kern_module()
 
 function build_unittest_kerN_module()
 {
-        kern_module_name=`basename "$test_file" .c`
-        gen_build_kmodule_comp
-        gen_kern_module_mk $kern_module_name
-        gen_build_kmodule ${kerN_ver}
-        make all
-        /bin/mv $KTF_MK ${unitMK_temp_dir}/${kerN_ver}/$kern_module_name.mk
-        /bin/mv $kern_module_name.ko ${unitM_temp_dir}/${kerN_ver}
+    kern_module_name=`basename "$test_file" .c`
+    gen_build_kmodule_comp
+    gen_kern_module_mk $kern_module_name
+    gen_build_kmodule ${kerN_ver}
+    make all
+    /bin/mv $KTF_MK ${unitMK_temp_dir}/${kerN_ver}/$kern_module_name.mk
+    /bin/mv $kern_module_name.ko ${unitM_temp_dir}/${kerN_ver}
 }

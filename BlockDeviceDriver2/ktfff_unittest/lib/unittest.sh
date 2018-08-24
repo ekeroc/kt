@@ -52,3 +52,55 @@ function unittest_start()
         unittest_output $kerN_ver
     done
 }
+
+
+function unittest_check()
+{
+    local cmd_lsit=$@
+    local suite_list=()
+    
+    for cmd in $cmd_lsit; do
+        select_test=${cmd##*=}
+        if [[ $cmd = *"--test"* ]]; then
+            suite_list+=($(get_testcase_file_in_unittests $select_test))
+            if [ $? -ne 0 ]; then
+                echo "TestCase $select_test not found." >&2
+                exit 1
+            fi
+        elif [[ $cmd = *"--suite"* ]]; then
+            suite_list+=($(get_suite_file_in_unittests $select_test))
+            if [ $? -ne 0 ]; then
+                echo "Suite $select_test not found." >&2
+                exit 1
+            fi
+        else
+            echo "Unknown arguments: $cmd" >&2
+            usage
+        fi
+    done
+    echo ${suite_list[*]}
+}
+
+function get_testcase_file_in_unittests()
+{
+    local test_case=$1
+    for test_file in $KTFFF_DIR/unittests/*.c; do
+        if grep -Fq "ADD_TEST($test_case)" $test_file ; then
+            echo $test_file
+            return 0
+        fi
+    done
+    exit 1
+}
+
+function get_suite_file_in_unittests()
+{
+    local suite_file=$1
+    for test_file in $KTFFF_DIR/unittests/*.c; do
+        if [[ $test_file = $KTFFF_DIR/unittests/$suite_file ]]; then
+            echo $test_file
+            return 0
+        fi
+    done
+    exit 1
+}

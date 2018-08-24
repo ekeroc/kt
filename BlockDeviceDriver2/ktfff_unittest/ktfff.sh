@@ -3,7 +3,8 @@ source lib/config.sh
 source lib/install.sh
 source lib/makefile.sh
 source lib/unittest.sh
-
+set -e 
+set -o pipefail
 #####################################################
 #               Ktfff Unittest Tool                 #
 #                                                   #
@@ -41,36 +42,22 @@ function ktfff_info()
 
 function unittest_main()
 {
+    local suite_list=$@
     mkdir -p $unitM_temp_dir
     mkdir -p $unitMK_temp_dir
     mkdir -p $unit_output_dir
 
     # build_user_daemon
     ktfff_info "BUILDING KERNEL MODULE"
-    build_all_kern_module
+    if [ "$suite_list" ]; then
+        build_all_kern_module $suite_list
+    else
+        build_all_kern_module $KTFFF_DIR/unittests/*.c
+    fi
+
     ktfff_info "UNNITEST START"
     unittest_start
     ktfff_info "UNNITEST COMPLETE"
-}
-
-function unittest_check()
-{
-    local cmd_lsit=$@
-    local test_list=()
-    local suite_list=()
-
-    for cmd in $cmd_lsit; do
-        if [[ $cmd = *"--test"* ]]; then
-            test_case=${cmd##*=}
-            test_list+=($test_case)
-        elif [[ $cmd = *"--suite"* ]]; then
-            suite_file=${cmd##*=}
-            suite_list+=($suite_file)
-        else
-            echo "Unknown arguments: $cmd"
-            usage
-        fi
-    done
 }
 
 export LANG=en_US
@@ -101,13 +88,11 @@ while [ "$#" ]; do
             ;;
         run )
             shift
-            # if [ $# -gt 0 ]; then
-                # only run the specific test case 
-            # fi
-            # echo $@
-            unittest_check $@
+            if [ $# -gt 0 ]; then
+                suite_list=$(unittest_check $@)
+            fi
             clean_env
-            unittest_main
+            unittest_main $suite_list
             exit
             ;;
         clean )

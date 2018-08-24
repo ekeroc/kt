@@ -1,5 +1,4 @@
-INSTALL_DIR=~/src
-BUILD_DIR=~/build/`uname -r`
+
 
 function install_gtest()
 {

@@ -25,6 +25,12 @@ function clean_env()
     sudo /bin/rm -rf $unit_output_dir
 }
 
+function ktfff_insmod()
+{   
+    sudo $BUILD_DIR/ktf/kernel/ktf.ko
+
+}
+
 function ktfff_info()
 {
     local info_str=$1
@@ -61,7 +67,7 @@ function unittest_check()
             suite_file=${cmd##*=}
             suite_list+=($suite_file)
         else
-            printf "Unknown arguments: $cmd\n"
+            echo "Unknown arguments: $cmd"
             usage
         fi
     done
@@ -100,8 +106,8 @@ while [ "$#" ]; do
             # fi
             # echo $@
             unittest_check $@
-            # clean_env
-            # unittest_main
+            clean_env
+            unittest_main
             exit
             ;;
         clean )
@@ -117,3 +123,22 @@ while [ "$#" ]; do
     esac
     shift
 done 
+
+
+# 1. Run All && Collect Result
+# 2. Run One && Collect Result
+# 3. Build && Run
+# 4. Install ktfff
+
+
+# print:
+# 	var=-I$(_DISCO_CN_ROOT)common/
+# 	$(info $$var is [${var}])
+
+# find . -type f -name ".*.cmd" -or 
+# find . -type f -name "*.o.*" -delete
+# find . -type f -name ".*.cmd" -delete
+# find . -type f -name "*.o" -delete
+
+
+# /bin/mv: cannot stat 'test_hello.ko': No such file or directory

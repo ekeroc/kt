@@ -53,20 +53,27 @@ DEFINE_FFF_GLOBALS;
 FAKE_VALUE_FUNC(int32_t, init_drv_component);
 FAKE_VALUE_FUNC(int32_t, rel_drv_component);
 
+
+void setup(void)
+{
+	RESET_FAKE(init_drv_component);
+	RESET_FAKE(rel_drv_component);
+}
+
 TEST(examples, hello_ok)
 {	
+	setup();
 	init_drv_component_fake.return_val = true;
 	ASSERT_TRUE(init_drv_component());
-
-	// init_drv(123);
-	// should mock init_dmsc_config and init_chrdev
 	ASSERT_INT_EQ(init_drv_component_fake.call_count, 1);
 }
 
 
 TEST(examples, hello_fail)
 {	
-	// ASSERT_INT_EQ(20, 20);
+	setup();
+	rel_drv_component_fake.return_val = false;
+	ASSERT_TRUE(rel_drv_component());
 }
 
 static void add_tests(void)

@@ -63,13 +63,13 @@ function unittest_check_build_file()
         if [[ $cmd = *"--test"* ]]; then
             suite_list+=($(get_testcase_file_in_unittests $select_test))
             if [ $? -ne 0 ]; then
-                echo "TestCase $select_test not found." >&2
+                ktfff_error "TestCase $select_test not found." >&2
                 exit 1
             fi
         elif [[ $cmd = *"--suite"* ]]; then
             suite_list+=($(get_suite_file_in_unittests $select_test))
             if [ $? -ne 0 ]; then
-                echo "Suite $select_test not found." >&2
+                ktfff_error "Suite $select_test not found." >&2
                 exit 1
             fi
         else

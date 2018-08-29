@@ -74,7 +74,7 @@ function unittest_main()
         set -e 
         suite_list=$(unittest_check_build_file $@)
         filter=$(unittest_get_filter $@)
-
+        
         ktfff_info "BUILDING KERNEL MODULE"
         build_all_kern_module $suite_list
         set +e
@@ -118,7 +118,6 @@ while [ "$#" ]; do
             ;;
         run )
             shift
-            clean_env
             unittest_main $@
             exit
             ;;

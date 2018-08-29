@@ -15,7 +15,7 @@
 #include <linux/workqueue.h>
 #include <linux/blkdev.h>
 
-#define DMSC_sock_recvmsg(sock,msg_ptr,size,flag)   sock_recvmsg(sock,msg_ptr,size,flag)
+#define DMSC_sock_recvmsg(sock,msg_ptr,size,flag)   sock_recvmsg(sock,msg_ptr,flag)
 
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 10, 0)
 #define hlist_for_each_entry_safe_ccma(tpos, pos, n, head, member)      \

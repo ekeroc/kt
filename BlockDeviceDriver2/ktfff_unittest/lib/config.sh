@@ -10,8 +10,8 @@ unit_output_dir=$KTFFF_DIR/unittest-output
 
 
 # --- Install variable --------------------------------------------
-INSTALL_DIR=~/src
-BUILD_DIR=~/build/`uname -r`
+INSTALL_DIR=~ktfff/src
+BUILD_DIR=~ktfff/build/`uname -r`
 
 
 # --- Makefile variable -------------------------------------------

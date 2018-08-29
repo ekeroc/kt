@@ -37,8 +37,13 @@ function ktfff_setup()
 	mkdir -p $BUILD_DIR
 
     cd $INSTALL_DIR
-    sudo git clone https://github.com/google/googletest.git
-    sudo git clone https://github.com/oracle/ktf.git
+	
+	if [ ! -d "$INSTALL_DIR/googletest" ] ; then
+		sudo git clone https://github.com/google/googletest.git
+	fi
+ 	if [ ! -d "$INSTALL_DIR/ktf" ] ; then
+		sudo git clone https://github.com/oracle/ktf.git
+	fi
     
     install_package
     install_gtest

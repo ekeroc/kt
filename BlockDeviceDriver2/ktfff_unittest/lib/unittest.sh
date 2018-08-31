@@ -92,13 +92,14 @@ function unittest_get_filter()
         usage >&2        
     fi
 
-    for select_test in $cmd_list; do
+    for cmd in $cmd_list; do
         if [[ $cmd = *"--test"* ]]; then
-            select_test=${select_test##*=}
+            select_test=${cmd##*=}
             gtest_filter+="*$select_test*:"
         fi
     done
-    echo $gtest_filter
+
+    echo $gtest_filter 
 }
 
 # --- Exec kernel module with insomd or rmmod command -------------
@@ -106,6 +107,7 @@ function exec_unittest_module()
 {
     local kerN_ver_dir=$1
     local cmd=$2
+    
     for test_module in $kerN_ver_dir/*; do
         cmd_err=$(sudo $cmd $test_module 2>&1)
 
@@ -120,7 +122,11 @@ function exec_unittest_module()
 function unittest_run()
 {
     local gtest_filter=$1
-    ktfrun --gtest_output=xml $gtest_filter 
+    if [[ ${#gtest_filter} -eq 15 ]]; then
+        ktfrun --gtest_output=xml
+    else
+        ktfrun --gtest_output=xml $gtest_filter 
+    fi
 }
 
 function unittest_start()

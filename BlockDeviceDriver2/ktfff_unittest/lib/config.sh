@@ -10,8 +10,9 @@ unit_output_dir=$KTFFF_DIR/unittest-output
 
 
 # --- Install variable --------------------------------------------
-INSTALL_DIR=~/ktfff/src
-BUILD_DIR=~/ktfff/build/`uname -r`
+KTFFF_BASE_DIR=~/ktfff
+INSTALL_DIR=$KTFFF_BASE_DIR/src
+BUILD_DIR=$KTFFF_BASE_DIR/build/`uname -r`
 
 
 # --- Makefile variable -------------------------------------------
@@ -24,8 +25,3 @@ subcomp="${subcomp} discoNNOVW_simulator discoNN_simulator discoNN_client metada
 subcomp="${subcomp} io_manager"
 
 mkfn_list="${subcomp} main"
-
-# major_num=0
-# minor_num=0
-# release_num=0
-# patch_num=0

@@ -4,7 +4,7 @@ function install_gtest()
 {
 	mkdir -p $BUILD_DIR/googletest
 	cd $BUILD_DIR/googletest
-	cmake ~/src/googletest
+	cmake $INSTALL_DIR/googletest
 	make
 	sudo make install
 }
@@ -16,7 +16,7 @@ function install_ktf()
 
 	mkdir -p $BUILD_DIR/ktf
 	cd $BUILD_DIR/ktf
-	~/src/ktf/configure KVER=`uname -r`
+	$INSTALL_DIR/ktf/configure KVER=`uname -r`
 	make
 	sudo make install
 }
@@ -40,12 +40,33 @@ function ktfff_setup()
 	
 	if [ ! -d "$INSTALL_DIR/googletest" ] ; then
 		sudo git clone https://github.com/google/googletest.git
+	else
+		cd $INSTALL_DIR/googletest
+		sudo git pull
+		cd $KTFFF_DIR
 	fi
+
  	if [ ! -d "$INSTALL_DIR/ktf" ] ; then
 		sudo git clone https://github.com/oracle/ktf.git
+	else
+		cd $INSTALL_DIR/ktf
+		sudo git pull
+		cd $KTFFF_DIR
 	fi
     
     install_package
     install_gtest
     install_ktf
+
+	sudo rm -rf /usr/lib/libktf.*
+	sudo ln -s /usr/local/lib/libktf.so* /usr/lib
+	sudo ldconfig
+}
+
+function ktfff_uninstall()
+{	
+	sudo rm -rf /usr/lib/libktf.*
+	sudo rm -rf /usr/local/lib/libktf.*
+	sudo rm -rf $KTFFF_BASE_DIR
+	ktfff_info "KTFFF UNINSTALL."
 }

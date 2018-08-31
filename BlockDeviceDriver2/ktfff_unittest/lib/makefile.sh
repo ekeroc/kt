@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function write_kmodule_mkfn()
 {
     printf "${1}" >> $KTFFF_DIR/Makefile
@@ -76,6 +78,7 @@ function build_all_kern_module()
         fullpath="${kverN_arr[${idx}]}"
         kerN_ver=`echo ${fullpath#${kern_header_root_dir}}`
 
+        ktfff_event "Mkdir /unittest_mk_temp, /unittest_module_temp for ${kerN_ver}."
         mkdir -p ${unitM_temp_dir}/${kerN_ver}
         mkdir -p ${unitMK_temp_dir}/${kerN_ver}
 
@@ -92,9 +95,15 @@ function build_unittest_kerN_module()
     gen_build_kmodule_comp
     gen_kern_module_mk $kern_module_name
     gen_build_kmodule ${kerN_ver}
+
+    check_kern_ver ${kerN_ver}
     make all
+    restore_patch
 
     # Move MK and kernel module to unitest temp folder
+    ktfff_event "Move Makefile to /unittest-mk-temp/${kerN_ver}."
     /bin/mv $KTF_MK ${unitMK_temp_dir}/${kerN_ver}/$kern_module_name.mk
+
+    ktfff_event "Move Makefile to /unittest-module-temp/${kerN_ver}."
     /bin/mv $kern_module_name.ko ${unitM_temp_dir}/${kerN_ver}
 }

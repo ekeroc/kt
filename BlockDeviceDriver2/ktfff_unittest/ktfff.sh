@@ -1,23 +1,39 @@
 #!/bin/bash
 source lib/config.sh
 source lib/install.sh
+source lib/kerN_ver_patch.sh
 source lib/makefile.sh
+source lib/message.sh
 source lib/unittest.sh
 
 #######################################################
 #              Ktfff Unittest Runner                  #
 #                                                     #
-#   install         - install ktf framework           #
+#   install         - install ktfff framework         #
 #   run             - build && run all unittest       #
 #   run --test=     - build && run single unittest    #
 #   run --suite=    - build && run single unittest    #
 #   clean           - clean all generated file        #
+#   uninstall       - uninstall ktfff framewokr       #
 #                                                     #
 #######################################################
 
-#######################################################
-#               Runner Flow                           #
-#######################################################
+#########################################################################################
+#                                   Run Flow                                            #                                                                
+#   1. unittest_main                                    Main function.                  #
+#                   ↓                                                                   # 
+#   2. unittest_check_build_file                        Get the select test file & test #
+#      unittest_get_filter                              filter list (--test, --suite).  #
+#                   ↓                                                                   #
+#   3. build_all_kern_module                                                            #
+#       -   build_unittest_kerN_module                  Build each test file module.    #
+#           -   gen_build_kmodule_comp                  Generate kernel Makefile.       #
+#           -   gen_kern_module_mk $kern_module_name                                    #
+#           -   gen_build_kmodule ${kerN_ver}                                           #
+#                   ↓                                                                   #
+#   4. unittest_start                                                                   #
+#                                                                                       #
+#########################################################################################
 
 function clean_env()
 {
@@ -25,30 +41,14 @@ function clean_env()
     find $KTFFF_DIR/../ -type f -name "*.o.*" -delete
     find $KTFFF_DIR/../ -type f -name ".*.cmd" -delete
     find $KTFFF_DIR/../ -type f -name "*.o" -delete
-    sudo /bin/rm -rf *.symvers *.mod.c Module.markers modules.order .tmp_versions *.xml
+    find $KTFFF_DIR/../ -type f -name "*.h.orig" -delete
+    sudo /bin/rm -rf *.symvers *.mod.c Module.markers modules.order .tmp_versions *.xml 
     sudo /bin/rm -rf *.ko
     sudo /bin/rm -rf Makefile
     sudo /bin/rm -rf $unitM_temp_dir
     sudo /bin/rm -rf $unitMK_temp_dir
     sudo /bin/rm -rf $unit_output_dir
 }
-
-function ktfff_info()
-{
-    local info_str=$1
-    Col='\e[0m'
-    BIBlu='\e[0;96m'
-    printf "\n${BIBlu}[INFO] ${Col}$info_str \n"
-}
-
-function ktfff_error()
-{
-    local error_str=$1
-    Col='\e[0m'
-    BIBlu='\e[1;95m'
-    printf "\n${BIBlu}[ERR] ${Col}$error_str \n"
-}
-
 
 function ktfff_insmod()
 {   
@@ -63,18 +63,16 @@ function unittest_main()
     local suite_list=
     local filter=""
 
+    ktfff_event "Mkdir unittest temp folder."
     mkdir -p $unitM_temp_dir
     mkdir -p $unitMK_temp_dir
     mkdir -p $unit_output_dir
-
-    # build_user_daemon?
 
     # If options exist --test, --suite, if not will run all ./unittests/files
     if [ $# -gt 0 ]; then
         set -e 
         suite_list=$(unittest_check_build_file $@)
         filter=$(unittest_get_filter $@)
-        
         ktfff_info "BUILDING KERNEL MODULE"
         build_all_kern_module $suite_list
         set +e
@@ -124,6 +122,11 @@ while [ "$#" ]; do
         clean )
             shift
             clean_env
+            exit
+            ;;
+        uninstall )
+            shift
+            ktfff_uninstall
             exit
             ;;
         -h | --help )

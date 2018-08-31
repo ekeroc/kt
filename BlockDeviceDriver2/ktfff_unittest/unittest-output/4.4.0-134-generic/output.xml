@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="2" failures="1" disabled="0" errors="0" timestamp="2018-08-31T13:32:10" time="0" name="AllTests">
+  <testsuite name="examples" tests="2" failures="1" disabled="0" errors="0" time="0">
+    <testcase name="/hello_fail" value_param="&quot;hello_fail&quot;" status="run" time="0" classname="examples">
+      <failure message="/home/louis/clientnode-uf/BlockDeviceDriver2/ktfff_unittest/unittests/test_hello.c:76&#x0A;Failure &apos;(rel_drv_component())&apos; occurred " type=""><![CDATA[/home/louis/clientnode-uf/BlockDeviceDriver2/ktfff_unittest/unittests/test_hello.c:76
+Failure '(rel_drv_component())' occurred ]]></failure>
+    </testcase>
+    <testcase name="/hello_ok" value_param="&quot;hello_ok&quot;" status="run" time="0" classname="examples" />
+  </testsuite>
+</testsuites>

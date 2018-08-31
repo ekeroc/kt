@@ -1,0 +1,1 @@
+cmd_/home/louis/clientnode-uf/BlockDeviceDriver2/ktfff_unittest/built-in.o :=  rm -f /home/louis/clientnode-uf/BlockDeviceDriver2/ktfff_unittest/built-in.o; ar rcsD /home/louis/clientnode-uf/BlockDeviceDriver2/ktfff_unittest/built-in.o
